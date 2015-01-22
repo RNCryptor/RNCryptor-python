@@ -51,21 +51,19 @@ elif PY3:
 
 
 class RNCryptor(object):
-    """Cryptor for RNCryptor"""
+    """Cryptor for RNCryptor."""
 
     AES_BLOCK_SIZE = AES.block_size
     AES_MODE = AES.MODE_CBC
     SALT_SIZE = 8
 
     def pre_decrypt_data(self, data):
-        """ Change this function for handling data before decryption. """
-
+        """Handle data before decryption."""
         data = to_bytes(data)
         return data
 
     def post_decrypt_data(self, data):
-        """ Removes useless symbols which appear over padding for AES (PKCS#7). """
-
+        """Remove useless symbols which appear over padding for AES (PKCS#7)."""
         data = data[:-bord(data[-1])]
         return to_str(data)
 
@@ -94,15 +92,13 @@ class RNCryptor(object):
         return self.post_decrypt_data(decrypted_data)
 
     def pre_encrypt_data(self, data):
-        """ Does padding for the data for AES (PKCS#7). """
-
+        """Do padding for the data for AES (PKCS#7)."""
         data = to_bytes(data)
         rem = self.AES_BLOCK_SIZE - len(data) % self.AES_BLOCK_SIZE
         return data + bchr(rem) * rem
 
     def post_encrypt_data(self, data):
-        """ Change this function for handling data after encryption. """
-
+        """Handle data after encryption."""
         return data
 
     def encrypt(self, data, password):
