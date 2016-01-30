@@ -50,6 +50,27 @@ elif PY3:
         return s
 
 
+if hasattr(hmac, 'compare_digest'):
+    def compare_in_constant_time(left, right):
+        return hmac.compare_digest(left, right)
+else:
+    def compare_in_constant_time(left, right):
+        length_left = len(left)
+        length_right = len(right)
+
+        result = length_left - length_right
+        for i, byte in enumerate(right):
+            result |= bord(left[i % length_left]) ^ bord(byte)
+        return result == 0
+
+
+compare_in_constant_time.__doc__ = """\
+Compare two values in time proportional to the second one.
+
+Return True if the values are equal, False otherwise.
+"""
+
+
 class RNCryptor(object):
     """Cryptor for RNCryptor."""
 
@@ -84,7 +105,7 @@ class RNCryptor(object):
         encryption_key = self._pbkdf2(password, encryption_salt)
         hmac_key = self._pbkdf2(password, hmac_salt)
 
-        if self._hmac(hmac_key, data[:n - 32]) != hmac:
+        if not compare_in_constant_time(self._hmac(hmac_key, data[:n - 32]), hmac):
             raise Exception("Bad data")
 
         decrypted_data = self._aes_decrypt(encryption_key, iv, cipher_text)
