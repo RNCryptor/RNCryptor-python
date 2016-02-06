@@ -1,5 +1,8 @@
 sudo: false
 
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
 cache:
   directories:
     - $HOME/.cache/pip
@@ -19,9 +22,11 @@ matrix:
     - python: "3.5"
       env: TOXENV=py35
 
-install: pip install tox
+install:
+  - pip install tox
 
-script: tox $(nproc)
+script:
+  - tox $(nproc)
 
 notifications:
   email: false
