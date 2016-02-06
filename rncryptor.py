@@ -11,6 +11,9 @@ from Crypto.Protocol import KDF
 from Crypto import Random
 
 
+__version__ = '3.0.0'
+
+
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 

@@ -1,4 +1,9 @@
 *.pyc
 
+# packaging staff
+build/
+dist/
+*.egg-info/
+
 # pytest cache
 .cache/

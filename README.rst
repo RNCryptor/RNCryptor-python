@@ -1,2 +1,4 @@
-# RNCryptor-python
+RNCryptor-python
+================
+
 Python implementation of RNCryptor
