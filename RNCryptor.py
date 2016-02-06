@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 from __future__ import print_function
 
@@ -167,31 +166,3 @@ class RNCryptor(object):
     def _pbkdf2(self, password, salt, iterations=10000, key_length=32):
         return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations,
                           prf=lambda p, s: hmac.new(p, s, hashlib.sha1).digest())
-
-
-def main():
-    from time import time
-
-    cryptor = RNCryptor()
-
-    passwords = 'p@s$VV0Rd', 'пароль'
-    texts = 'test', 'текст', '', '1' * 16, '2' * 15, '3' * 17
-
-    for password in passwords:
-        for text in texts:
-            print('text: "{}"'.format(text))
-
-            s = time()
-            encrypted_data = cryptor.encrypt(text, password)
-            print('encrypted', time() - s)
-
-            s = time()
-            decrypted_data = cryptor.decrypt(encrypted_data, password)
-            print('decrypted {}: "{}"\n'.format(time() - s, decrypted_data))
-
-            assert text == decrypted_data
-
-
-if __name__ == '__main__':
-
-    main()
