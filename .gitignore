@@ -7,3 +7,6 @@ dist/
 
 # pytest cache
 .cache/
+
+# tox cache
+.tox/
