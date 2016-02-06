@@ -1,4 +1,8 @@
-*.pyc
+# backups
+*~
+
+# python bytecode
+*.py[cod]
 
 # packaging staff
 build/
