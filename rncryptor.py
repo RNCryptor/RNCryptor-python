@@ -1,16 +1,17 @@
+"""Python implementation of RNCryptor."""
 from __future__ import print_function
 
 import hashlib
 import hmac
 import sys
 
+from Crypto import Random
 from Crypto.Cipher import AES
 from Crypto.Protocol import KDF
-from Crypto import Random
 
 
+__all__ = ('RNCryptor',)
 __version__ = '3.0.0'
-
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
@@ -74,8 +75,6 @@ Return True if the values are equal, False otherwise.
 class RNCryptor(object):
     """Cryptor for RNCryptor."""
 
-    AES_BLOCK_SIZE = AES.block_size
-    AES_MODE = AES.MODE_CBC
     SALT_SIZE = 8
 
     def pre_decrypt_data(self, data):
@@ -89,6 +88,7 @@ class RNCryptor(object):
         return to_str(data)
 
     def decrypt(self, data, password):
+        """Decrypt `data` using `password`."""
         data = self.pre_decrypt_data(data)
         password = to_bytes(password)
 
@@ -115,7 +115,8 @@ class RNCryptor(object):
     def pre_encrypt_data(self, data):
         """Do padding for the data for AES (PKCS#7)."""
         data = to_bytes(data)
-        rem = self.AES_BLOCK_SIZE - len(data) % self.AES_BLOCK_SIZE
+        aes_block_size = AES.block_size
+        rem = aes_block_size - len(data) % aes_block_size
         return data + bchr(rem) * rem
 
     def post_encrypt_data(self, data):
@@ -123,6 +124,7 @@ class RNCryptor(object):
         return data
 
     def encrypt(self, data, password):
+        """Encrypt `data` using `password`."""
         data = self.pre_encrypt_data(data)
         password = to_bytes(password)
 
@@ -153,17 +155,19 @@ class RNCryptor(object):
 
     @property
     def iv(self):
-        return Random.new().read(self.AES_BLOCK_SIZE)
+        return Random.new().read(AES.block_size)
 
     def _aes_encrypt(self, key, iv, text):
-        return AES.new(key, self.AES_MODE, iv).encrypt(text)
+        return AES.new(key, AES.MODE_CBC, iv).encrypt(text)
 
     def _aes_decrypt(self, key, iv, text):
-        return AES.new(key, self.AES_MODE, iv).decrypt(text)
+        return AES.new(key, AES.MODE_CBC, iv).decrypt(text)
 
     def _hmac(self, key, data):
         return hmac.new(key, data, hashlib.sha256).digest()
 
+    def _prf(self, secret, salt):
+        return hmac.new(secret, salt, hashlib.sha1).digest()
+
     def _pbkdf2(self, password, salt, iterations=10000, key_length=32):
-        return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations,
-                          prf=lambda p, s: hmac.new(p, s, hashlib.sha1).digest())
+        return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations, prf=self._prf)
