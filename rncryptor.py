@@ -10,7 +10,7 @@ from Crypto.Cipher import AES
 from Crypto.Protocol import KDF
 
 
-__all__ = ('RNCryptor',)
+__all__ = ('RNCryptor', 'decrypt', 'encrypt')
 __version__ = '3.0.0'
 
 PY2 = sys.version_info[0] == 2
@@ -171,3 +171,19 @@ class RNCryptor(object):
 
     def _pbkdf2(self, password, salt, iterations=10000, key_length=32):
         return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations, prf=self._prf)
+
+
+def decrypt(data, password):
+    cryptor = RNCryptor()
+    return cryptor.decrypt(data, password)
+
+
+decrypt.__doc__ = RNCryptor.decrypt.__doc__
+
+
+def encrypt(data, password):
+    cryptor = RNCryptor()
+    return cryptor.encrypt(data, password)
+
+
+encrypt.__doc__ = RNCryptor.encrypt.__doc__
