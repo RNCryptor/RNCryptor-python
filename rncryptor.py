@@ -72,6 +72,10 @@ Return True if the values are equal, False otherwise.
 """
 
 
+class DecryptionError(Exception):
+    pass
+
+
 class RNCryptor(object):
     """Cryptor for RNCryptor."""
 
@@ -106,7 +110,7 @@ class RNCryptor(object):
         hmac_key = self._pbkdf2(password, hmac_salt)
 
         if not compare_in_constant_time(self._hmac(hmac_key, data[:n - 32]), hmac):
-            raise Exception("Bad data")
+            raise DecryptionError("Bad data")
 
         decrypted_data = self._aes_decrypt(encryption_key, iv, cipher_text)
 
