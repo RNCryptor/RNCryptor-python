@@ -74,18 +74,10 @@ Return True if the values are equal, False otherwise.
 
 class RNCryptorError(Exception):
     """Base error for when anything goes wrong with RNCryptor."""
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 
 class DecryptionError(RNCryptorError):
     """Raised when bad data is inputted."""
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 
 class RNCryptor(object):
