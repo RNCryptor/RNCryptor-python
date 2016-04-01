@@ -72,7 +72,13 @@ Return True if the values are equal, False otherwise.
 """
 
 
-class DecryptionError(Exception):
+class RNCryptorError(Exception):
+    """Base error for when anything goes wrong with RNCryptor"""
+    pass
+
+
+class DecryptionError(RNCryptorError):
+    """Raised when bad data is inputted"""
     pass
 
 
