@@ -13,7 +13,7 @@ def get_long_description():
 
 setup(
     name='rncryptor',
-    version='3.1.0',
+    version='3.2.0',
     description='Python implementation of RNCryptor',
     long_description=get_long_description(),
     url='https://github.com/RNCryptor/RNCryptor-python',
