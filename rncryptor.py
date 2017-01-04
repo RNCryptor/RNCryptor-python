@@ -32,6 +32,8 @@ if PY2:
         return ord(s)
 
 elif PY3:
+    unicode = str  # hack for pyflakes (https://bugs.launchpad.net/pyflakes/+bug/1585991)
+
     def to_bytes(s):
         if isinstance(s, bytes):
             return s
