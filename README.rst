@@ -34,3 +34,14 @@ Usage
     encrypted_data = rncryptor.encrypt(data, password)
     decrypted_data = rncryptor.decrypt(encrypted_data, password)
     assert data == decrypted_data
+
+Testing
+-------
+
+.. code-block:: bash
+
+    $ tox
+    $ tox -e py27  # test using only Python2.7
+    $ tox $(nproc)  # run tests using all processes
+
+An actual command can be found in `tox.ini <tox.ini>`_, but basically it's a common ``py.test`` with a bunch of plugins.
