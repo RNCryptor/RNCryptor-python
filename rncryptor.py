@@ -102,8 +102,8 @@ class RNCryptor(object):
 
         n = len(data)
 
-        version = data[0]
-        options = data[1]
+        # version = data[0]  # unused now
+        # options = data[1]  # unused now
         encryption_salt = data[2:10]
         hmac_salt = data[10:18]
         iv = data[18:34]

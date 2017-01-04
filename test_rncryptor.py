@@ -1,7 +1,7 @@
 # coding: utf-8
-import rncryptor
-
 import pytest
+
+import rncryptor
 
 
 DATA = (
