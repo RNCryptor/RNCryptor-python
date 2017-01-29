@@ -1,6 +1,10 @@
 RNCryptor-python
 ================
 
+.. image:: https://img.shields.io/pypi/v/rncryptor.svg
+    :alt: Actual PyPI version
+    :target: https://pypi.python.org/pypi/rncryptor/
+
 .. image:: https://travis-ci.org/RNCryptor/RNCryptor-python.svg?branch=master
     :target: https://travis-ci.org/RNCryptor/RNCryptor-python
     :alt: CI status
@@ -12,7 +16,7 @@ Installation
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/RNCryptor/RNCryptor-python.git#egg=rncryptor
+    $ pip install rncryptor
 
 Usage
 -----
