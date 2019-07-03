@@ -5,8 +5,8 @@ RNCryptor-python
     :alt: Actual PyPI version
     :target: https://pypi.python.org/pypi/rncryptor/
 
-.. image:: https://travis-ci.org/RNCryptor/RNCryptor-python.svg?branch=master
-    :target: https://travis-ci.org/RNCryptor/RNCryptor-python
+.. image:: https://travis-ci.org/furritos/RNCryptor-python.svg?branch=master
+    :target: https://travis-ci.org/furritos/RNCryptor-python
     :alt: CI status
 
 Python implementation of `RNCryptor <https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md>`_
