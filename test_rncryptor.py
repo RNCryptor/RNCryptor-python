@@ -3,7 +3,6 @@ import pytest
 
 import rncryptor
 
-
 DATA = (
     'test',
     'текст',

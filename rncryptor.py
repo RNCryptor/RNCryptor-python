@@ -9,7 +9,6 @@ from Crypto import Random
 from Crypto.Cipher import AES
 from Crypto.Protocol import KDF
 
-
 __all__ = ('RNCryptor', 'decrypt', 'encrypt')
 __version__ = '3.2.0'
 

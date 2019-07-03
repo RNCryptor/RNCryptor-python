@@ -1,7 +1,7 @@
 from codecs import open
 from os import path
-from setuptools import setup
 
+from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
 
@@ -33,6 +33,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Security :: Cryptography',
     ],
