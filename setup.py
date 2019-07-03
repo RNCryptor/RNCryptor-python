@@ -33,10 +33,11 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Security :: Cryptography',
     ],
     keywords='RNCryptor cryptography',
     py_modules=['rncryptor'],
-    install_requires=['pycrypto>=2.5']
+    install_requires=['pycryptodome>=3.8']
 )
