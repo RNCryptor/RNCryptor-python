@@ -85,6 +85,8 @@ class RNCryptor(object):
     """Cryptor for RNCryptor."""
 
     SALT_SIZE = 8
+    IV_SIZE = 16
+    HMAC_SIZE = 32
 
     def pre_decrypt_data(self, data):
         """Handle data before decryption."""
@@ -103,17 +105,18 @@ class RNCryptor(object):
 
         n = len(data)
 
-        # version + options + encryption_salt + hmac_salt + iv + hmac = 66
-        min_header_length = 1 + 1 + 8 + 8 + 16 + 32
+        # version + options + encryption_salt + hmac_salt + iv + hmac
+        # = 1 + 1 + 8 + 8 + 16 + 32 = 66
+        min_length = 1 + 1 + self.SALT_SIZE + self.SALT_SIZE + self.IV_SIZE + self.HMAC_SIZE
 
-        if n < min_header_length:
+        if n < min_length:
             # data doesn't even match the required header + hmac length
-            raise DecryptionError("Unknown header")
+            raise DecryptionError("Invalid length")
 
         version = data[0]
         if not version == b'\x03':
             # required version is version 3
-            raise DecryptionError("Unknown header")
+            raise DecryptionError("Unsupported version")
 
         options = data[1]
 
@@ -143,18 +146,18 @@ class RNCryptor(object):
 
         n = len(data)
 
-        # version + options + iv + hmac = 50
-        min_header_length = 1 + 1 + 16 + 32
+        # version + options + iv + hmac = 1 + 1 + 16 + 32 = 50
+        min_length = 1 + 1 + self.IV_SIZE + self.HMAC_SIZE
 
-        if n < min_header_length:
+        if n < min_length:
             # data doesn't even match the required header + hmac length
-            raise DecryptionError("Unknown header")
+            raise DecryptionError("Invalid length")
 
         version = data[0]
 
         if not version == b'\x03':
             # required version is version 3
-            raise DecryptionError("Unknown header")
+            raise DecryptionError("Unsupported version")
 
         options = data[1]
 

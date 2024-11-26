@@ -88,8 +88,9 @@ def test_enc_keys_dec_pass_func_should_raise_exception(encryption_salt, hmac_sal
     encryption_key = rncryptor.make_key(password, encryption_salt)
     hmac_key = rncryptor.make_key(password, hmac_salt)
     encrypted_data = rncryptor.encrypt_with_keys(data, hmac_key, encryption_key)
-    with pytest.raises(rncryptor.DecryptionError):
+    with pytest.raises(rncryptor.DecryptionError) as exception:
         rncryptor.decrypt(encrypted_data, password)
+    assert str(exception.value) == 'Invalid credential type'
 
 
 @pytest.mark.parametrize('encryption_salt', ENCRYPTION_SALT)
@@ -102,29 +103,40 @@ def test_enc_pass_dec_keys_func_should_raise_exception(encryption_salt, hmac_sal
     encryption_key = rncryptor.make_key(password, encryption_salt)
     hmac_key = rncryptor.make_key(password, hmac_salt)
     encrypted_data = rncryptor.encrypt(data, password)
-    with pytest.raises(rncryptor.DecryptionError):
+    with pytest.raises(rncryptor.DecryptionError) as exception:
         rncryptor.decrypt_with_keys(encrypted_data, hmac_key, encryption_key)
+    assert str(exception.value) == 'Invalid credential type'
 
 
-@pytest.mark.parametrize('data', BAD_DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
-def test_decryption_short_header_should_raise_exception(data, password):
+def test_decryption_short_header_should_raise_exception(password):
+    plaintext = "Test string"
+    data = rncryptor.encrypt(plaintext, password)
+
     # minimum length is 66 bytes
-    data = data[65:]
-    with pytest.raises(rncryptor.DecryptionError):
+    data = data[0:65]
+
+    with pytest.raises(rncryptor.DecryptionError) as exception:
         rncryptor.decrypt(data, password)
 
+    assert str(exception.value) == 'Invalid length'
 
-@pytest.mark.parametrize('data', BAD_DATA)
+
 @pytest.mark.parametrize('password', PASSWORD_DATA)
 @pytest.mark.parametrize('enc_salt', ENCRYPTION_SALT)
 @pytest.mark.parametrize('hmac_salt', HMAC_SALT)
-def test_dec_with_keys_short_header_should_raise_exception(data, password, enc_salt, hmac_salt):
-    # minimum length is 50 bytes
-    data = data[49:]
+def test_dec_with_keys_short_header_should_raise_exception(password, enc_salt, hmac_salt):
 
     encryption_key = rncryptor.make_key(password, enc_salt)
     hmac_key = rncryptor.make_key(password, hmac_salt)
 
-    with pytest.raises(rncryptor.DecryptionError):
+    plaintext = "Test string"
+    data = rncryptor.encrypt_with_keys(plaintext, hmac_key, encryption_key)
+
+    # minimum length is 50 bytes
+    data = data[0:49]
+
+    with pytest.raises(rncryptor.DecryptionError) as exception:
         rncryptor.decrypt_with_keys(data, hmac_key, encryption_key)
+
+    assert str(exception.value) == 'Invalid length'
