@@ -19,9 +19,13 @@ PASSWORD_DATA = (
     'p@s$VV0Rd',
     'пароль',
 )
-SALT = (
+ENCRYPTION_SALT = (
     'lPVVIl6Z',
     'TSDTe9c6',
+)
+HMAC_SALT = (
+    'gtLVYm0F',
+    'lMqCcaJw',
 )
 
 
@@ -49,8 +53,8 @@ def test_decryption_bad_data_should_raise_exception(data, password):
         rncryptor.decrypt(data, password)
 
 
-@pytest.mark.parametrize('encryption_salt', SALT)
-@pytest.mark.parametrize('hmac_salt', SALT)
+@pytest.mark.parametrize('encryption_salt', ENCRYPTION_SALT)
+@pytest.mark.parametrize('hmac_salt', HMAC_SALT)
 @pytest.mark.parametrize('data', DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
 def test_enc_dec_with_keys_methods_should_be_correct(encryption_salt, hmac_salt, data, password):
@@ -62,8 +66,8 @@ def test_enc_dec_with_keys_methods_should_be_correct(encryption_salt, hmac_salt,
     assert data == decrypted_data
 
 
-@pytest.mark.parametrize('encryption_salt', SALT)
-@pytest.mark.parametrize('hmac_salt', SALT)
+@pytest.mark.parametrize('encryption_salt', ENCRYPTION_SALT)
+@pytest.mark.parametrize('hmac_salt', HMAC_SALT)
 @pytest.mark.parametrize('data', DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
 def test_enc_dec_with_keys_functions_should_be_correct(encryption_salt, hmac_salt, data, password):
@@ -74,8 +78,8 @@ def test_enc_dec_with_keys_functions_should_be_correct(encryption_salt, hmac_sal
     assert data == decrypted_data
 
 
-@pytest.mark.parametrize('encryption_salt', SALT)
-@pytest.mark.parametrize('hmac_salt', SALT)
+@pytest.mark.parametrize('encryption_salt', ENCRYPTION_SALT)
+@pytest.mark.parametrize('hmac_salt', HMAC_SALT)
 @pytest.mark.parametrize('data', DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
 def test_enc_keys_dec_pass_func_should_raise_exception(encryption_salt, hmac_salt, data, password):
@@ -88,8 +92,8 @@ def test_enc_keys_dec_pass_func_should_raise_exception(encryption_salt, hmac_sal
         rncryptor.decrypt(encrypted_data, password)
 
 
-@pytest.mark.parametrize('encryption_salt', SALT)
-@pytest.mark.parametrize('hmac_salt', SALT)
+@pytest.mark.parametrize('encryption_salt', ENCRYPTION_SALT)
+@pytest.mark.parametrize('hmac_salt', HMAC_SALT)
 @pytest.mark.parametrize('data', DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
 def test_enc_pass_dec_keys_func_should_raise_exception(encryption_salt, hmac_salt, data, password):
@@ -113,8 +117,14 @@ def test_decryption_short_header_should_raise_exception(data, password):
 
 @pytest.mark.parametrize('data', BAD_DATA)
 @pytest.mark.parametrize('password', PASSWORD_DATA)
-def test_decryption_with_keys_short_header_should_raise_exception(data, password):
+@pytest.mark.parametrize('enc_salt', ENCRYPTION_SALT)
+@pytest.mark.parametrize('hmac_salt', HMAC_SALT)
+def test_dec_with_keys_short_header_should_raise_exception(data, password, enc_salt, hmac_salt):
     # minimum length is 50 bytes
     data = data[49:]
+
+    encryption_key = rncryptor.make_key(password, enc_salt)
+    hmac_key = rncryptor.make_key(password, hmac_salt)
+
     with pytest.raises(rncryptor.DecryptionError):
-        rncryptor.decrypt(data, password)
+        rncryptor.decrypt_with_keys(data, hmac_key, encryption_key)
