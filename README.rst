@@ -39,6 +39,13 @@ Usage
     decrypted_data = rncryptor.decrypt(encrypted_data, password)
     assert data == decrypted_data
 
+    # encrypt_with_keys and decrypt_with keys functions
+    encryption_salt = '...' # 8 random bytes
+    encryption_key = rncryptor.make_key(password, encryption_salt)
+    hmac_key = rncryptor.make_key(password, hmac_salt)
+    encrypted_data = rncryptor.encrypt_with_keys(data, hmac_key, encryption_key)
+    decrypted_data = rncryptor.decrypt_with_keys(encrypted_data, hmac_key, encryption_key)
+
 Testing
 -------
 

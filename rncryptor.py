@@ -85,6 +85,8 @@ class RNCryptor(object):
     """Cryptor for RNCryptor."""
 
     SALT_SIZE = 8
+    IV_SIZE = 16
+    HMAC_SIZE = 32
 
     def pre_decrypt_data(self, data):
         """Handle data before decryption."""
@@ -103,8 +105,25 @@ class RNCryptor(object):
 
         n = len(data)
 
-        # version = data[0]  # unused now
-        # options = data[1]  # unused now
+        # version + options + encryption_salt + hmac_salt + iv + hmac
+        # = 1 + 1 + 8 + 8 + 16 + 32 = 66
+        min_length = 1 + 1 + self.SALT_SIZE + self.SALT_SIZE + self.IV_SIZE + self.HMAC_SIZE
+
+        if n < min_length:
+            # data doesn't even match the required header + hmac length
+            raise DecryptionError("Invalid length")
+
+        version = data[0]
+        if not version == b'\x03':
+            # required version is version 3
+            raise DecryptionError("Unsupported version")
+
+        options = data[1]
+
+        if not options == b'\x01':
+            # when using keys options should be `0`
+            raise DecryptionError("Invalid credential type")
+
         encryption_salt = data[2:10]
         hmac_salt = data[10:18]
         iv = data[18:34]
@@ -113,6 +132,42 @@ class RNCryptor(object):
 
         encryption_key = self._pbkdf2(password, encryption_salt)
         hmac_key = self._pbkdf2(password, hmac_salt)
+
+        if not compare_in_constant_time(self._hmac(hmac_key, data[:n - 32]), hmac):
+            raise DecryptionError("Bad data")
+
+        decrypted_data = self._aes_decrypt(encryption_key, iv, cipher_text)
+
+        return self.post_decrypt_data(decrypted_data)
+
+    def decrypt_with_keys(self, data, hmac_key, encryption_key):
+        """Decrypt `data` using `hmac_key` and `encryption_key`."""
+        data = self.pre_decrypt_data(data)
+
+        n = len(data)
+
+        # version + options + iv + hmac = 1 + 1 + 16 + 32 = 50
+        min_length = 1 + 1 + self.IV_SIZE + self.HMAC_SIZE
+
+        if n < min_length:
+            # data doesn't even match the required header + hmac length
+            raise DecryptionError("Invalid length")
+
+        version = data[0]
+
+        if not version == b'\x03':
+            # required version is version 3
+            raise DecryptionError("Unsupported version")
+
+        options = data[1]
+
+        if not options == b'\x00':
+            # when using keys options should be `0`
+            raise DecryptionError("Invalid credential type")
+
+        iv = data[2:18]
+        cipher_text = data[18:n - 32]
+        hmac = data[n - 32:]
 
         if not compare_in_constant_time(self._hmac(hmac_key, data[:n - 32]), hmac):
             raise DecryptionError("Bad data")
@@ -153,6 +208,26 @@ class RNCryptor(object):
         encrypted_data = new_data + self._hmac(hmac_key, new_data)
 
         return self.post_encrypt_data(encrypted_data)
+
+    def encrypt_with_keys(self, data, hmac_key, encryption_key):
+        """Encrypt `data` using `hmac_key` and `encryption_key`."""
+        data = self.pre_encrypt_data(data)
+
+        iv = self.iv
+        cipher_text = self._aes_encrypt(encryption_key, iv, data)
+
+        version = b'\x03'
+        options = b'\x00'
+
+        new_data = b''.join([version, options, iv, cipher_text])
+        encrypted_data = new_data + self._hmac(hmac_key, new_data)
+
+        return self.post_encrypt_data(encrypted_data)
+
+    def make_key(self, password, salt):
+        """Derive a key via PBKDF2 from `password` using `salt`."""
+        key = self._pbkdf2(password, salt)
+        return key
 
     @property
     def encryption_salt(self):
@@ -196,3 +271,28 @@ def encrypt(data, password):
 
 
 encrypt.__doc__ = RNCryptor.encrypt.__doc__
+
+
+def encrypt_with_keys(data, hmac_key, encryption_key):
+    cryptor = RNCryptor()
+    return cryptor.encrypt_with_keys(data, hmac_key, encryption_key)
+
+
+encrypt_with_keys.__doc__ = RNCryptor.encrypt_with_keys.__doc__
+
+
+def decrypt_with_keys(data, hmac_key, encryption_key):
+    cryptor = RNCryptor()
+    return cryptor.decrypt_with_keys(data, hmac_key, encryption_key)
+
+
+decrypt_with_keys.__doc__ = RNCryptor.decrypt_with_keys.__doc__
+
+
+def make_key(password, salt):
+    cryptor = RNCryptor()
+    key = cryptor.make_key(password, salt)
+    return key
+
+
+make_key.__doc__ = RNCryptor.make_key.__doc__
